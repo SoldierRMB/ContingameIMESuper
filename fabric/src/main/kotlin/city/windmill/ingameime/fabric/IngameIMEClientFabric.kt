@@ -1,7 +1,6 @@
 package city.windmill.ingameime.fabric
 
 import city.windmill.ingameime.IngameIMEClient
-import city.windmill.ingameime.client.*
 import city.windmill.ingameime.client.handler.KeyHandler
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.api.EnvType
