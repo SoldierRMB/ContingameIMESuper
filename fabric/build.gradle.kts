@@ -40,10 +40,6 @@ dependencies {
     //Cloth Api? "The Cloth API has largely been replaced by the Architectury API."
     //Architectury API
     modApi("dev.architectury:architectury-fabric:${rootProject.property("architectury_fabric_version")}")
-    //REI
-    modImplementation("me.shedaniel:RoughlyEnoughItems-fabric:${rootProject.property("rei_fabric_version")}")
-    //Stain
-    modCompileOnly("io.github.ladysnake:satin:${rootProject.property("satin_version")}")
     //Kotlin
     modImplementation("net.fabricmc:fabric-language-kotlin:${rootProject.property("fabric_language_kotlin_version")}")
     //Cloth Config
