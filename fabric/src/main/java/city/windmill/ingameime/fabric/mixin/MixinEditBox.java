@@ -67,7 +67,7 @@ abstract class MixinEditBox extends AbstractWidget {
     @Inject(method = "renderWidget",
             at = @At(value = "INVOKE", target = "java/lang/String.isEmpty()Z", ordinal = 1),
             locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void onCaret(GuiGraphics guiGraphics, int arg1, int arg2, float arg3, CallbackInfo ci, int l, int m, int n, String string, boolean bl, boolean bl2, int o, int p, int q, boolean bl3, int r) {
-        ClientScreenEventHooks.INSTANCE.getEDIT_CARET().invoker().onEditCaret(this, new Pair<>(r, p));
+    private void onCaret(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci, int k, int l, String string, boolean bl, boolean bl2, int m, int n, int o, int p, boolean bl3, int q) {
+        ClientScreenEventHooks.INSTANCE.getEDIT_CARET().invoker().onEditCaret(this, new Pair<>(q, n));
     }
 }
