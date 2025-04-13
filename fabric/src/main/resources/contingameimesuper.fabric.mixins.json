@@ -5,14 +5,14 @@
   "package": "city.windmill.ingameime.fabric.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "MixinAbstractSignEditScreen",
     "MixinBookEditScreen",
     "MixinChatScreen",
     "MixinEditBox",
     "MixinEditScreen",
     "MixinFullScreen",
     "MixinMinecraft",
-    "MixinScreen",
-    "MixinSignEditScreen"
+    "MixinScreen"
   ],
   "injectors": {
     "defaultRequire": 0
