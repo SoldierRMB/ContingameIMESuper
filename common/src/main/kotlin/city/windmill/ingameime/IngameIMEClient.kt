@@ -11,13 +11,16 @@ import dev.architectury.event.EventResult
 import dev.architectury.event.events.client.ClientGuiEvent
 import dev.architectury.event.events.client.ClientScreenInputEvent
 import dev.architectury.platform.Platform
+import dev.architectury.platform.client.ConfigurationScreenRegistry
 import net.minecraft.client.Minecraft
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 object IngameIMEClient {
     const val MODNAME = "ContingameIMESuper"
     const val MODID = "contingameimesuper"
-    val LOGGER = LoggerFactory.getLogger(MODNAME)
+    val LOGGER: Logger = LoggerFactory.getLogger(MODNAME)
+
     /**
      * Track mouse move
      */
@@ -25,7 +28,7 @@ object IngameIMEClient {
     private var prevY = 0
 
     fun registerConfigScreen() {
-        Platform.getMod(MODID).registerConfigurationScreen { parent ->
+        ConfigurationScreenRegistry.register(Platform.getMod(MODID)) { parent ->
             ConfigHandler.createConfigScreen().setParentScreen(parent).build()
         }
     }
@@ -41,19 +44,19 @@ object IngameIMEClient {
                 prevY = mouseY
             }
 
-            OverlayScreen.render(matrices, mouseX, mouseY, delta.realtimeDeltaTicks)
+            OverlayScreen.render(matrices, mouseX, mouseY, delta)
         })
         ClientScreenEventHooks.SCREEN_MOUSE_MOVE.register(ClientScreenEventHooks.MouseMove { _, _, _, _ ->
             IMEHandler.IMEState.onMouseMove()
         })
-        ClientScreenInputEvent.KEY_PRESSED_PRE.register(ClientScreenInputEvent.KeyPressed { _, _, keyCode, scanCode, modifiers ->
-            if (KeyHandler.KeyState.onKeyDown(keyCode, scanCode, modifiers))
+        ClientScreenInputEvent.KEY_PRESSED_PRE.register(ClientScreenInputEvent.KeyPressed { _, _, keyEvent ->
+            if (KeyHandler.KeyState.onKeyDown(keyEvent.key(), keyEvent.scancode(), keyEvent.modifiers()))
                 EventResult.interruptDefault()
             else
                 EventResult.pass()
         })
-        ClientScreenInputEvent.KEY_RELEASED_PRE.register(ClientScreenInputEvent.KeyReleased { _, _, keyCode, scanCode, modifiers ->
-            if (KeyHandler.KeyState.onKeyUp(keyCode, scanCode, modifiers))
+        ClientScreenInputEvent.KEY_RELEASED_PRE.register(ClientScreenInputEvent.KeyReleased { _, _, keyEvent ->
+            if (KeyHandler.KeyState.onKeyUp(keyEvent.key(), keyEvent.scancode(), keyEvent.modifiers()))
                 EventResult.interruptDefault()
             else
                 EventResult.pass()
@@ -61,13 +64,9 @@ object IngameIMEClient {
         ClientScreenEventHooks.WINDOW_SIZE_CHANGED.register(ClientScreenEventHooks.WindowSizeChanged { _, _ ->
             ExternalBaseIME.FullScreen = Minecraft.getInstance().window.isFullscreen
         })
-        with(ScreenHandler.ScreenState) {
-            ClientScreenEventHooks.SCREEN_CHANGED.register(ClientScreenEventHooks.ScreenChanged(ScreenHandler.ScreenState.Companion::onScreenChange))
-        }
-        with(ScreenHandler.ScreenState.EditState) {
-            ClientScreenEventHooks.EDIT_OPEN.register(ClientScreenEventHooks.EditOpen(ScreenHandler.ScreenState.EditState.Companion::onEditOpen))
-            ClientScreenEventHooks.EDIT_CARET.register(ClientScreenEventHooks.EditCaret(ScreenHandler.ScreenState.EditState.Companion::onEditCaret))
-            ClientScreenEventHooks.EDIT_CLOSE.register(ClientScreenEventHooks.EditClose(ScreenHandler.ScreenState.EditState.Companion::onEditClose))
-        }
+        ClientScreenEventHooks.SCREEN_CHANGED.register(ClientScreenEventHooks.ScreenChanged(ScreenHandler.ScreenState.Companion::onScreenChange))
+        ClientScreenEventHooks.EDIT_OPEN.register(ClientScreenEventHooks.EditOpen(ScreenHandler.ScreenState.EditState.Companion::onEditOpen))
+        ClientScreenEventHooks.EDIT_CARET.register(ClientScreenEventHooks.EditCaret(ScreenHandler.ScreenState.EditState.Companion::onEditCaret))
+        ClientScreenEventHooks.EDIT_CLOSE.register(ClientScreenEventHooks.EditClose(ScreenHandler.ScreenState.EditState.Companion::onEditClose))
     }
 }

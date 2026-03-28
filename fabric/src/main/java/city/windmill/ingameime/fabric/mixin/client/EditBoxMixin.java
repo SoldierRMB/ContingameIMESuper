@@ -1,27 +1,37 @@
-package city.windmill.ingameime.fabric.mixin;
+package city.windmill.ingameime.fabric.mixin.client;
 
 import city.windmill.ingameime.client.event.ClientScreenEventHooks;
 import kotlin.Pair;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(EditBox.class)
-abstract class MixinEditBox extends AbstractWidget {
+public abstract class EditBoxMixin extends AbstractWidget {
     @Shadow
     private boolean bordered;
 
     @Shadow
     private boolean isEditable;
 
-    private MixinEditBox(int i, int j, int k, int l, Component component) {
+    @Shadow
+    private int displayPos;
+
+    @Shadow
+    public abstract String getValue();
+
+    @Shadow
+    public abstract int getCursorPosition();
+
+    private EditBoxMixin(int i, int j, int k, int l, Component component) {
         super(i, j, k, l, component);
     }
 
@@ -49,11 +59,8 @@ abstract class MixinEditBox extends AbstractWidget {
             ClientScreenEventHooks.INSTANCE.getEDIT_OPEN().invoker().onEditOpen(this, new Pair<>(caretX, caretY));
     }
 
-    @Inject(method = "onClick", at = @At(value = "INVOKE",
-            target = "net/minecraft/util/Mth.floor(D)I",
-            shift = At.Shift.BEFORE,
-            ordinal = 0))
-    private void onFocused(double d, double e, CallbackInfo ci) {
+    @Inject(method = "onClick", at = @At("TAIL"))
+    private void onFocused(MouseButtonEvent mouseButtonEvent, boolean bl, CallbackInfo ci) {
         int x = this.getX();
         int y = this.getY();
         int caretX = bordered ? x + 4 : x;
@@ -64,10 +71,26 @@ abstract class MixinEditBox extends AbstractWidget {
             ClientScreenEventHooks.INSTANCE.getEDIT_CLOSE().invoker().onEditClose(this);
     }
 
-    @Inject(method = "renderWidget",
-            at = @At(value = "INVOKE", target = "java/lang/String.isEmpty()Z", ordinal = 1),
-            locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void onCaret(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci, int k, int l, String string, boolean bl, boolean bl2, int m, int n, int o, int p, boolean bl3, int q) {
-        ClientScreenEventHooks.INSTANCE.getEDIT_CARET().invoker().onEditCaret(this, new Pair<>(q, n));
+    @Inject(method = "renderWidget", at = @At("TAIL"))
+    private void onCaretTail(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+        if (!isFocused() || !isEditable) return;
+
+        String text = this.getValue();
+        int cursorPos = this.getCursorPosition();
+        int dispPos = this.displayPos;
+
+        if (dispPos > text.length()) dispPos = text.length();
+        if (cursorPos > text.length()) cursorPos = text.length();
+
+        int textXOffset = 0;
+        if (dispPos >= 0 && dispPos <= cursorPos) {
+            String displayedSub = text.substring(dispPos, cursorPos);
+            textXOffset = Minecraft.getInstance().font.width(displayedSub);
+        }
+
+        int renderX = (this.bordered ? this.getX() + 4 : this.getX()) + textXOffset;
+        int renderY = this.bordered ? this.getY() + (this.height - 8) / 2 : this.getY();
+
+        ClientScreenEventHooks.INSTANCE.getEDIT_CARET().invoker().onEditCaret(this, new Pair<>(renderX, renderY));
     }
 }

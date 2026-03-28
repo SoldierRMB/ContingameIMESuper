@@ -3,12 +3,12 @@ plugins {
 }
 
 architectury {
-    val enabled_platforms: String by rootProject
-    common(enabled_platforms.split(","))
+    val enabledPlatforms = rootProject.property("enabled_platforms").toString()
+    common(enabledPlatforms.split(","))
 }
 
 loom {
-    accessWidenerPath.set(file("src/main/resources/ingameime.accesswidener"))
+    accessWidenerPath.set(layout.projectDirectory.file("src/main/resources/ingameime.accesswidener"))
 }
 
 dependencies {

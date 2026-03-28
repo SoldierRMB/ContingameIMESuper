@@ -1,5 +1,4 @@
-package city.windmill.ingameime.fabric.mixin;
-
+package city.windmill.ingameime.fabric.mixin.client;
 
 import city.windmill.ingameime.client.handler.ConfigHandler;
 import city.windmill.ingameime.client.handler.IMEHandler;
@@ -13,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ChatScreen.class)
-public class MixinChatScreen {
+public class ChatScreenMixin {
     @Shadow
     protected EditBox input;
 

@@ -1,5 +1,8 @@
 plugins {
-    id("com.github.johnrengelman.shadow") version "8.+"
+    id("com.gradleup.shadow") version "9.4.0"
+    java
+    id("architectury-plugin")
+    id("dev.architectury.loom")
 }
 
 architectury {
@@ -8,17 +11,15 @@ architectury {
 }
 
 loom {
-    accessWidenerPath.set(project(":common").loom.accessWidenerPath)
+    accessWidenerPath.set(project(":common").layout.projectDirectory.file("src/main/resources/ingameime.accesswidener"))
 }
 
 val common: Configuration by configurations.creating
 val shadowCommon: Configuration by configurations.creating // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
-val developmentFabric: Configuration = configurations.getByName("developmentFabric")
-configurations {
-    compileClasspath.get().extendsFrom(configurations["common"])
-    runtimeClasspath.get().extendsFrom(configurations["common"])
-    developmentFabric.extendsFrom(configurations["common"])
-}
+
+configurations.getByName("compileClasspath").extendsFrom(common)
+configurations.getByName("runtimeClasspath").extendsFrom(common)
+configurations.getByName("developmentFabric").extendsFrom(common)
 
 repositories {
     maven("https://maven.fabricmc.net")
@@ -52,41 +53,41 @@ dependencies {
 }
 
 tasks {
-    processResources {
-        val version: String by project
-        val minecraft_version: String by project
+    named<ProcessResources>("processResources") {
+        val modVersion = project.version.toString()
 
-        inputs.property("version", version)
-        inputs.property("minecraft_version", minecraft_version)
+        inputs.property("version", modVersion)
 
         filesMatching("fabric.mod.json") {
             expand(
-                "version" to version,
-                "minecraft_version" to minecraft_version
+                mapOf(
+                    "version" to modVersion,
+                    "minecraft_version" to rootProject.property("minecraft_version")
+                )
             )
         }
     }
 
-    shadowJar {
+    val shadowJarTask = named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
         exclude("architectury.common.json")
         configurations = listOf(project.configurations["shadowCommon"])
         archiveClassifier.set("dev-shadow")
     }
 
-    remapJar {
+    named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
         injectAccessWidener.set(true)
-        inputFile.set(shadowJar.flatMap { it.archiveFile })
-        dependsOn(shadowJar)
+        inputFile.set(shadowJarTask.flatMap { it.archiveFile })
+        dependsOn(shadowJarTask)
         archiveClassifier.set("fabric")
     }
 
-    jar {
+    named<Jar>("jar") {
         archiveClassifier.set("dev")
     }
 
-    sourcesJar {
-        val commonSources = project(":common").tasks.getByName<Jar>("sourcesJar")
+    named<Jar>("sourcesJar") {
+        val commonSources = project(":common").tasks.named<Jar>("sourcesJar")
         dependsOn(commonSources)
-        from(commonSources.archiveFile.map { zipTree(it) })
+        from(zipTree(commonSources.flatMap { it.archiveFile }))
     }
 }

@@ -17,7 +17,7 @@ class CompositionWidget(font: Font) : Widget(font) {
 
     @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     override val width
-        get() = super.width + font.width(compositionData?.first) + caretWidth
+        get() = super.width + font.width(compositionData?.first ?: "") + caretWidth
     override val height
         get() = super.height + font.lineHeight
     override val padding: Pair<Int, Int>
@@ -36,7 +36,8 @@ class CompositionWidget(font: Font) : Widget(font) {
 
             var offsetX = offsetX + padding.first
             val offsetY = offsetY + padding.second
-            offsetX = guiGraphics.drawString(font, part1, offsetX, offsetY, textColor, false)
+            guiGraphics.drawString(font, part1, offsetX, offsetY, textColor, false)
+            offsetX += font.width(part1)
             //Caret-blink 0.5s
             if ((System.currentTimeMillis() % 1000) > 500) {
                 guiGraphics.fill(

@@ -36,13 +36,6 @@ allprojects {
     version = "${rootProject.property("mod_version")}-${project.property("minecraft_version")}"
     group = rootProject.property("maven_group").toString()
 
-    repositories {
-        maven {
-            name = "wdsj-io"
-            url = uri("https://repo.wdsj.io/repository/minecraft/")
-        }
-    }
-
     dependencies {
         compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:${property("kotlin_version")}")
     }
@@ -56,12 +49,9 @@ allprojects {
         withSourcesJar()
     }
 
-    val compileKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
-    compileKotlin.compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_21)
-    }
-    val compileTestKotlin: org.jetbrains.kotlin.gradle.tasks.KotlinCompile by tasks
-    compileTestKotlin.compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_21)
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
     }
 }

@@ -1,10 +1,11 @@
 package city.windmill.ingameime.client.jni
 
 import city.windmill.ingameime.IngameIMEClient
-import city.windmill.ingameime.client.handler.IMEHandler
 import city.windmill.ingameime.client.gui.OverlayScreen
+import city.windmill.ingameime.client.handler.IMEHandler
 import net.minecraft.client.Minecraft
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.client.input.CharacterEvent
+import net.minecraft.resources.Identifier
 import org.apache.logging.log4j.LogManager
 import org.lwjgl.glfw.GLFWNativeWin32.glfwGetWin32Window
 
@@ -44,13 +45,10 @@ object ExternalBaseIME {
 
     init {
         try {
-            val constructor = ResourceLocation::class.java.getDeclaredConstructor(String::class.java, String::class.java)
-            constructor.isAccessible = true
-            val resourceNative = constructor.newInstance("ingameime", "natives/jni.dll")
-//            val resourceNative = ResourceLocation("ingameime", "natives/jni.dll")
+            val resourceNative = Identifier.fromNamespaceAndPath("ingameime", "natives/jni.dll")
             NativeLoader.load(Minecraft.getInstance().resourceManager.getResource(resourceNative).orElseThrow())
             LOGGER.debug("Initialing window")
-            nInitialize(glfwGetWin32Window(Minecraft.getInstance().window.window))
+            nInitialize(glfwGetWin32Window(Minecraft.getInstance().window.handle()))
             FullScreen = Minecraft.getInstance().window.isFullscreen
         } catch (ex: Exception) {
             LOGGER.error("Failed in initializing ExternalBaseIME:", ex)
@@ -79,16 +77,21 @@ object ExternalBaseIME {
                 OverlayScreen.composition = null
                 iCommitListener.onCommit(str!!).onEach { ch ->
                     Minecraft.getInstance().keyboardHandler
-                        .charTyped(Minecraft.getInstance().window.window, ch.code, 0)
+                        .charTyped(Minecraft.getInstance().window.handle(), CharacterEvent(ch.code, 0))
                 }
             }
             CompositionState.Start,
             CompositionState.End,
             CompositionState.Update -> {
                 OverlayScreen.composition = if (str.isNullOrEmpty()) null else str to caret
+                if (!str.isNullOrEmpty()) {
+                    OverlayScreen.showAlphaMode = false
+                }
             }
         }
-        OverlayScreen.showAlphaMode = false
+        if (state == CompositionState.Commit) {
+            OverlayScreen.showAlphaMode = false
+        }
     }
 
     @Suppress("unused")

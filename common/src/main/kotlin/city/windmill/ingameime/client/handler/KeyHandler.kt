@@ -6,6 +6,7 @@ import com.mojang.blaze3d.platform.InputConstants
 import kotlinx.coroutines.*
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
+import net.minecraft.resources.Identifier
 import org.apache.logging.log4j.LogManager
 import org.lwjgl.glfw.GLFW
 import java.lang.ref.WeakReference
@@ -19,7 +20,7 @@ object KeyHandler {
         "key.ingameime.hotkey",
         InputConstants.Type.KEYSYM,
         GLFW.GLFW_KEY_HOME,
-        "category.ingameime.keybinding"
+        KeyMapping.Category(Identifier.fromNamespaceAndPath("contingameimesuper", "keybinding"))
     )
     
     private val LOGGER = LogManager.getFormatterLogger(IngameIMEClient.MODNAME + "|KeyHandler")!!

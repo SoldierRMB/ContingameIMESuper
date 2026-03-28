@@ -42,7 +42,7 @@ class CandidateListWidget(font: Font) : Widget(font) {
         
         @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
         override val width
-            get() = super.width + font.width(text) + indexWidth
+            get() = super.width + font.width(text ?: "") + indexWidth
         override val height
             get() = super.height + font.lineHeight
         override val padding: Pair<Int, Int>
@@ -66,8 +66,8 @@ class CandidateListWidget(font: Font) : Widget(font) {
             color: Int
         ) {
             guiGraphics.drawString(
-                font, text,
-                (centerX - font.width(text) / 2), y, color, false
+                font, text ?: "",
+                (centerX - font.width(text ?: "") / 2), y, color, false
             )
         }
         

@@ -65,7 +65,7 @@ object OverlayScreen : net.minecraft.client.gui.components.Renderable {
         get() = with(compositionWidget) {
             val scale = Minecraft.getInstance().window.guiScale
             intArrayOf(offsetX, offsetY, offsetX + width, offsetY + height).apply {
-                forEachIndexed { index, i -> this[index] = i.times(scale).toInt() }
+                forEachIndexed { index, i -> this[index] = i.times(scale) }
             }
         }
 
@@ -79,15 +79,17 @@ object OverlayScreen : net.minecraft.client.gui.components.Renderable {
      * Render the widget when input method is active
      */
     override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
+        val poseStack = guiGraphics.pose()
+        poseStack.pushMatrix()
+
         if (ExternalBaseIME.State) {
-            val poseStack = guiGraphics.pose()
-            poseStack.pushPose()
-            poseStack.translate(0.0, 0.0, 500.0)
             compositionWidget.render(guiGraphics, mouseX, mouseY, delta)
-            alphaModeWidget.render(guiGraphics, mouseX, mouseY, delta)
             candidateListWidget.render(guiGraphics, mouseX, mouseY, delta)
-            poseStack.popPose()
         }
+        // AlphaModeWidget has its own active timeout condition. This guarantees visibility globally if toggled.
+        alphaModeWidget.render(guiGraphics, mouseX, mouseY, delta)
+
+        poseStack.popMatrix()
     }
 
     /**
