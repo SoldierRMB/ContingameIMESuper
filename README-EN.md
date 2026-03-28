@@ -4,6 +4,8 @@
 
 # ContingameIMESuper
 
+Since an input method has already been built into the official release (version 26.1), maintenance of this project will be permanently discontinued.
+
 An unofficial continuation of [ContingameIME](https://github.com/ThinkingStudios/ContingameIME). Use input method in full screen Minecraft.
 
 [ZH-CN](README.md) / EN-US

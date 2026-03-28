@@ -4,6 +4,8 @@
 
 # ContingameIMESuper
 
+由于官方在 26.1 中已经内置了输入法，所以本项目会永久停止维护。
+
 [ContingameIME](https://github.com/ThinkingStudios/ContingameIME) 的非官方续更版。在全屏的Minecraft中使用输入法。
 
 ZH-CN / [EN-US](README-EN.md)
