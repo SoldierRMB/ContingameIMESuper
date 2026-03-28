@@ -35,8 +35,5 @@
     "fabric-language-kotlin": "*",
     "architectury": "*",
     "cloth-config": "*"
-  },
-  "recommends": {
-    "satin": "*"
   }
 }
