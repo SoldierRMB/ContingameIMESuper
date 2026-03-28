@@ -4,17 +4,17 @@ on: [ pull_request, push, workflow_dispatch ]
 
 jobs:
   Build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
       - name: Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
@@ -25,13 +25,8 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew build
-      - name: Upload artifacts (forge)
-        uses: actions/upload-artifact@v3
-        with:
-          name: 1.20.x-forge
-          path: ${{ github.workspace }}/forge/build/libs
       - name: Upload artifacts (fabric)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: 1.20.x-fabric
+          name: ContingameIMESuper-fabric
           path: ${{ github.workspace }}/fabric/build/libs
