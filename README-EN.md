@@ -38,7 +38,6 @@ An unofficial continuation of [ContingameIME](https://github.com/ThinkingStudios
     - [Fabric Language Kotlin](https://www.curseforge.com/minecraft/mc-mods/fabric-language-kotlin)
     - [Cloth Config API (Fabric)](https://www.curseforge.com/minecraft/mc-mods/cloth-config)
     - [Architectury API (Fabric)](https://www.curseforge.com/minecraft/mc-mods/architectury-api)
-    - [Satin API](https://www.curseforge.com/minecraft/mc-mods/satin-api) **(Optional, conflicts with Optifine)**
 
 ### This Mod requires VCRuntime141 to run, download it on the official website of Microsoft [Download Link](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist)
 
